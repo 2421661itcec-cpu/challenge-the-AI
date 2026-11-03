@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070a17">
+  <meta name="description" content="AI Stone Paper Scissors — College Career Fest Edition. Real-time computer vision hand tracking with MediaPipe.">
+  <title>AI Stone Paper Scissors — College Career Fest Edition</title>
+
+  <!-- Google Fonts: Orbitron & Rajdhani -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-container" id="appContainer">
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div class="brand-text">
+          <h1>FEST<span>.ARENA</span></h1>
+          <div class="brand-sub" id="headerEventSub">CAREER FEST 2026</div>
+        </div>
+      </div>
+
+      <!-- Player Profile Pill -->
+      <div class="player-xp-pill" id="playerProfileBtn" title="Click to edit profile / view achievements">
+        <span class="player-name-chip" id="topPlayerName">Player One</span>
+        <span class="player-level-badge" id="topPlayerLevel">LVL 1</span>
+        <div class="xp-bar-mini" titl
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        e="XP Progress to next level">
+          <div class="xp-bar-fill" id="topXpFill"></div>
+        </div>
+      </div>
+
+      <!-- Topbar Action Navigation -->
+      <nav class="nav-actions">
+        <a href="ai-stone-paper-scissors-fest.zip" download="ai-stone-paper-scissors-fest.zip" class="icon-btn" title="Download Complete Project ZIP" aria-label="Download ZIP" style="text-decoration: none; color: var(--gold); border-color: rgba(255, 215, 0, 0.4);">📥</a>
+        <button class="icon-btn dashboard-nav-btn" id="dashboardNavBtn" title="Player Dashboard" aria-label="Player Dashboard">▦</button>
+        <button class="icon-btn" id="tutorialNavBtn" title="How to Play & Camera Calibration" aria-label="Tutorial">🎓</button>
+        <button class="icon-btn" id="leaderboardNavBtn" title="Exhibition Leaderboard" aria-label="Leaderboard">🏆</button>
+        <button class="icon-btn" id="statsNavBtn" title="Statistics & Achievements" aria-label="Statistics">📊</button>
+        <button class="icon-btn" id="exhibitionNavBtn" title="Booth Info & Mobile QR Code" aria-label="Exhibition Info">🎪</button>
+        <button class="icon-btn" id="settingsNavBtn" title="Game & Kiosk Settings" aria-label="Settings">⚙️</button>
+        <button class="icon-btn" id="fullscreenNavBtn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">⛶</button>
+      </nav>
+    </header>
+
+    <!-- Hero / Mode Status Strip -->
+    <section class="hero-strip">
+      <div class="mode-badge-wrap">
+        <div class="mode-badge" id="currentModeBadge">BEST OF 5</div>
+        <button class="difficulty-pill hard" id="currentDifficultyPill" title="Click to cycle difficulty: Easy -> Normal -> Hard -> Nightmare">🔥 HARD AI</button>
+      </div>
+      <div class="streak-counter" id="streakDisplay">
+        <span>🔥</span> STREAK: <strong id="streakCount">0</strong> (BEST: <span id="bestStreakCount">0</span>)
+      </div>
+    </section>
+
+    <!-- Scoreboard -->
+    <section class="scoreboard" aria-label="Scoreboard">
+      <div class="score-card player">
+        <span id="scoreboardPlayerName">YOU</span>
+        <strong id="playerScore">0</strong>
+      </div>
+      <div class="score-card draw-center">
+        <span>DRAWS</span>
+        <strong id="drawScore">0</strong>
+      </div>
+      <div class="score-card ai">
+        <span id="scoreboardAiName">CYBER BOT</span>
+        <strong id="aiScore">0</strong>
+      </div>
+    </section>
+
+    <!-- Arena: Player vs AI Robot -->
+    <main class="arena-grid">
+      <!-- Player Panel -->
+      <section class="arena-card" id="playerCard">
+        <div class="card-header">
+          <div class="fighter-name" id="playerCardName">PLAYER ONE</div>
+          <div class="fighter-tag human">HUMAN</div>
+        </div>
+        <div class="video-wrap">
+          <video id="video" autoplay playsinline muted class="hidden"></video>
+          <canvas id="landmarksCanvas"></canvas>
+          <div id="cameraPlaceholder" class="camera-placeholder">
+            <div class="placeholder-icon">📷</div>
+            <p id="placeholderText">Camera will start when you begin the match</p>
+          </div>
+          <div class="cam-live-indicator" id="camStatus">CAMERA STANDBY</div>
+          <button class="cam-overlay-btn" id="toggleOverlayBtn" title="Toggle Skeleton Overlay">🦴 Skeleton</button>
+        </div>
+        <div class="gesture-box">
+          <div class="gesture-icon" id="playerGesture">🤚</div>
+          <div class="gesture-info">
+            <div class="gesture-title" id="playerMoveLabel">READY</div>
+            <div class="gesture-desc" id="handStatus">Position your hand in frame</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Versus & Countdown -->
+      <div class="arena-center">
+        <div class="round-info-pill" id="roundLabel">ROUND 1 / 5</div>
+        <div class="vs-circle">VS</div>
+        <div class="countdown-box" id="countdownBox">READY?</div>
+      </div>
+
+      <!-- AI Opponent Panel -->
+      <section class="arena-card robot-card" id="robotCard">
+        <div class="card-header">
+          <div class="fighter-name" id="robotCardName">CYBER BOT</div>
+          <div class="fighter-tag ai-tag" id="robotCardTag">AI OPPONENT</div>
+        </div>
+        <div class="robot-wrap">
+          <div class="robot-avatar" id="robotAvatar">
+            <div id="aiHandVisual" class="ai-hand-render" role="img" aria-label="Animated AI hand gesture">✊</div>
+          </div>
+          <div class="robot-caption" id="robotVersionTag">CYBER-TACTICIAN</div>
+        </div>
+        <div class="gesture-box">
+          <div class="gesture-icon" id="aiGesture">🤖</div>
+          <div class="gesture-info">
+            <div class="gesture-title" id="aiMoveLabel">AI IS READY</div>
+            <div class="gesture-desc" id="aiStatus">Markov Prediction Active</div>
+            <div class="ai-telemetry-badge" id="aiTelemetryBadge">🧠 Mind-Reader: Tracking Bias</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Result Banner -->
+    <div id="resultBanner" class="result-banner" role="status" aria-live="polite">
+      READY TO PLAY? CLICK START MATCH TO BEGIN!
+    </div>
+
+    <!-- Main Controls -->
+    <div class="controls-row">
+      <button id="startBtn" class="btn-primary">▶ START MATCH</button>
+      <button id="nextBtn" class="btn-primary hidden">NEXT ROUND →</button>
+      <button id="pauseBtn" class="btn-secondary hidden">⏸ PAUSE</button>
+      <button id="restartBtn" class="btn-secondary">↻ RESTART</button>
+      <button id="soundToggleBtn" class="btn-secondary" aria-pressed="true">♫ SFX: ON</button>
+      <button id="voiceToggleBtn" class="btn-secondary" aria-pressed="true">🗣 VOICE: ON</button>
+    </div>
+
+    <!-- Fallback Manual Controls (if camera unavailable or user prefers keyboard) -->
+    <div class="fallback-bar" id="fallbackControls">
+      <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-display);">MANUAL MOVE:</span>
+      <button class="gesture-btn" data-move="stone" title="Press '1' on keyboard">✊ STONE</button>
+      <button class="gesture-btn" data-move="paper" title="Press '2' on keyboard">✋ PAPER</button>
+      <button class="gesture-btn" data-move="scissors" title="Press '3' on keyboard">✌️ SCISSORS</button>
+    </div>
+
+    <!-- Guidance Hint -->
+    <p class="hint-text" id="hintText">
+      Hold your hand clearly facing the camera when the countdown reaches SHOOT!
+    </p>
+
+    <!-- Privacy Note -->
+    <div class="privacy-badge">
+      <span>🔒</span>
+      <span><b>100% PRIVATE & ON-DEVICE:</b> Camera frames are processed strictly in your browser via WebAssembly & WebGL. No video is ever saved or transmitted.</span>
+    </div>
+
+    <!-- Footer Event Branding -->
+    <footer class="footer-branding">
+      <div id="footerEventText">College Career & Tech Fest 2026 • AI Interactive Arena</div>
+      <div id="footerTeamText">Dept. of Computer Science & AI • Team CyberArena</div>
+    </footer>
+  </div>
+
+  <!-- ========================================================================
+       MODALS & OVERLAYS
+       ======================================================================== -->
+
+  <!-- Welcome / Title Screen Overlay -->
+  <div class="overlay" id="welcomeOverlay">
+    <div class="modal-card">
+      <div class="modal-header-icon">🤖✨</div>
+      <div style="font-family: var(--font-display); font-size: 12px; letter-spacing: 3px; color: var(--cyan); margin-bottom: 6px;">
+        COLLEGE CAREER FEST EXHIBITION
+      </div>
+      <h2>CHALLENGE <span>THE AI!</span></h2>
+      <p>Step into the arena! Show your hand gesture to the camera, test your intuition against our real-time computer vision AI, and claim the championship!</p>
+
+      <!-- Player Nickname Input -->
+      <div style="margin: 16px auto; max-width: 320px; text-align: left;">
+        <label for="welcomeNickname" style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">CHALLENGER NICKNAME:</label>
+        <input type="text" id="welcomeNickname" maxlength="15" placeholder="Enter your name" style="width: 100%;">
+      </div>
+
+      <!-- Game Mode Selection -->
+      <div style="margin: 14px 0; text-align: left;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">SELECT GAME MODE:</label>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px;">
+          <button class="btn-secondary mode-select-btn active" data-mode="best_of_5">Best of 5</button>
+          <button class="btn-secondary mode-select-btn" data-mode="quick">Quick Match</button>
+          <button class="btn-secondary mode-select-btn" data-mode="survival">Survival</button>
+          <button class="btn-secondary mode-select-btn" data-mode="time_attack">Time Attack</button>
+          <button class="btn-secondary mode-select-btn" data-mode="practice">Practice</button>
+        </div>
+      </div>
+
+      <!-- Difficulty Selection -->
+      <div style="margin: 14px 0 20px; text-align: left;">
+        <label style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">AI DIFFICULTY (CHALLENGE LEVEL):</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button class="btn-secondary diff-select-btn" data-diff="easy">Easy (Random)</button>
+          <button class="btn-secondary diff-select-btn" data-diff="normal">Normal (Tactical)</button>
+          <button class="btn-secondary diff-select-btn active" data-diff="hard">🔥 Hard (Overlord)</button>
+          <button class="btn-secondary diff-select-btn" data-diff="nightmare">💀 Nightmare (Grandmaster)</button>
+        </div>
+      </div>
+
+      <button id="welcomeStartBtn" class="btn-primary" style="width: 100%; justify-content: center; font-size: 14px; padding: 16px;">
+        ⚡ ENTER THE ARENA
+      </button>
+
+      <p style="font-size: 12px; color: var(--text-dim); margin-top: 14px;">
+        Camera permission is required. Works best in Chrome or Edge on localhost/HTTPS.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- Player Dashboard -->
+  <div class="overlay hidden" id="dashboardOverlay">
+    <div class="modal-card large dashboard-modal">
+      <button class="modal-close-btn" id="closeDashboardBtn" aria-label="Close dashboard">&times;</button>
+      <div class="dashboard-heading">
+        <div>
+          <div class="dashboard-eyebrow">PLAYER CONTROL CENTER</div>
+          <h2>PLAYER <span>DASHBOARD</span></h2>
+          <p>Your career progress, match performance and recent activity.</p>
+        </div>
+        <div class="dashboard-rank" id="dashboardRank">LVL 1</div>
+      </div>
+
+      <section class="dashboard-profile">
+        <div class="dashboard-avatar">👾</div>
+        <div class="dashboard-profile-copy">
+          <strong id="dashboardPlayerName">PLAYER ONE</strong>
+          <span id="dashboardLevelTitle">NOVICE CHALLENGER</span>
+          <div class="dashboard-xp-track"><div id="dashboardXpFill"></div></div>
+          <small id="dashboardXpText">0 / 150 XP TO NEXT LEVEL</small>
+        </div>
+        <div class="dashboard-xp-total"><strong id="dashboardTotalXp">0</strong><span>TOTAL XP</span></div>
+      </section>
+
+      <div class="dashboard-stat-grid">
+        <article class="dashboard-stat"><span>MATCHES PLAYED</span><strong id="dashMatches">0</strong><small>Career total</small></article>
+        <article class="dashboard-stat stat-win"><span>ROUND WINS</span><strong id="dashWins">0</strong><small>Successful moves</small></article>
+        <article class="dashboard-stat stat-rate"><span>WIN RATE</span><strong id="dashWinRate">0%</strong><small>Across all rounds</small></article>
+        <article class="dashboard-stat stat-streak"><span>BEST STREAK</span><strong id="dashBestStreak">0</strong><small>Consecutive wins</small></article>
+      </div>
+
+      <div class="dashboard-lower-grid">
+        <section class="dashboard-panel">
+          <div class="dashboard-panel-title"><span>GESTURE BREAKDOWN</span><small>YOUR MOVE HISTORY</small></div>
+          <div class="gesture-metric">
+            <div class="gesture-metric-label"><span>✊ STONE</span><b id="dashStoneCount">0</b></div>
+            <div class="gesture-track"><div id="dashStoneBar"></div></div>
+          </div>
+          <div class="gesture-metric">
+            <div class="gesture-metric-label"><span>✋ PAPER</span><b id="dashPaperCount">0</b></div>
+            <div class="gesture-track paper-track"><div id="dashPaperBar"></div></div>
+          </div>
+          <div class="gesture-metric">
+            <div class="gesture-metric-label"><span>✌️ SCISSORS</span><b id="dashScissorsCount">0</b></div>
+            <div class="gesture-track scissors-track"><div id="dashScissorsBar"></div></div>
+          </div>
+          <div class="dashboard-favorite" id="dashFavoriteMove">Play rounds to discover your favorite move.</div>
+        </section>
+
+        <section class="dashboard-panel">
+          <div class="dashboard-panel-title"><span>ACHIEVEMENT PROGRESS</span><small>UNLOCKED BADGES</small></div>
+          <div class="achievement-progress-line">
+            <strong id="dashAchievements">0 / 9</strong>
+            <span>achievements unlocked</span>
+          </div>
+          <div class="achievement-track"><div id="dashAchievementBar"></div></div>
+          <div class="dashboard-mini-facts">
+            <div><span>CURRENT STREAK</span><b id="dashCurrentStreak">0</b></div>
+            <div><span>TIME ATTACK BEST</span><b id="dashTimeAttack">0</b></div>
+            <div><span>SURVIVAL BEST</span><b id="dashSurvival">0</b></div>
+          </div>
+          <button class="dashboard-link-btn" id="dashboardAchievementsBtn">VIEW ALL ACHIEVEMENTS →</button>
+        </section>
+      </div>
+
+      <section class="dashboard-panel dashboard-history-panel">
+        <div class="dashboard-panel-title"><span>RECENT MATCHES</span><small>LAST 5 MATCHES</small></div>
+        <div class="dashboard-history" id="dashboardHistory">
+          <div class="dashboard-empty">No matches recorded yet. Start a match to build your career stats.</div>
+        </div>
+      </section>
+      <div class="dashboard-footer">
+        <span>⚡ PROGRESS SAVED ON THIS DEVICE</span>
+        <button class="btn-secondary" id="dashboardDoneBtn">CLOSE DASHBOARD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tutorial & Calibration Modal -->
+  <div class="overlay hidden" id="tutorialOverlay">
+    <div class="modal-card large">
+      <button class="modal-close-btn" id="closeTutorialBtn">&times;</button>
+      <div class="modal-header-icon">🎓</div>
+      <h2>HOW TO PLAY & <span>CALIBRATION</span></h2>
+
+      <div class="modal-tabs">
+        <button class="tab-btn active" data-tab="tut-gestures">1. Gestures</button>
+        <button class="tab-btn" data-tab="tut-camera">2. Camera & Calibration</button>
+        <button class="tab-btn" data-tab="tut-rules">3. Game Rules</button>
+      </div>
+
+      <!-- Tab 1: Gestures -->
+      <div class="tab-content" id="tut-gestures">
+        <p>Make sure your hand is visible and palm faces the camera. Hold your gesture steady!</p>
+        <div class="tutorial-gesture-grid">
+          <div class="tutorial-gesture-card">
+            <div class="big-emoji">✊</div>
+            <strong>STONE (Rock)</strong>
+            <p>Close all fingers into a firm fist. Beats Scissors, loses to Paper.</p>
+          </div>
+          <div class="tutorial-gesture-card">
+            <div class="big-emoji">✋</div>
+            <strong>PAPER</strong>
+            <p>Open flat palm with all 5 fingers spread out. Beats Stone, loses to Scissors.</p>
+          </div>
+          <div class="tutorial-gesture-card">
+            <div class="big-emoji">✌️</div>
+            <strong>SCISSORS</strong>
+            <p>Extend index and middle fingers in a "V". Beats Paper, loses to Stone.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Calibration Diagnostics -->
+      <div class="tab-content hidden" id="tut-camera">
+        <p>Live camera feedback helps you position your hand for 100% recognition accuracy:</p>
+        <div class="calib-box">
+          <div class="calib-row">
+            <span>Camera Stream:</span>
+            <span class="status-badge good" id="calibCamStatus">Active</span>
+          </div>
+          <div class="calib-row">
+            <span>Lighting Estimation:</span>
+            <span class="status-badge good" id="calibLightStatus">Checking...</span>
+          </div>
+          <div class="calib-row">
+            <span>Hand Distance:</span>
+            <span class="status-badge warning" id="calibDistanceStatus">Searching...</span>
+          </div>
+          <div class="calib-row">
+            <span>Detected Gesture:</span>
+            <strong id="calibGestureName" style="color: var(--cyan);">None</strong>
+          </div>
+        </div>
+        <p style="font-size: 13px;"><b>Best Practices:</b> Keep your hand 1.5 to 3 feet from the lens. Avoid strong backlights or holding your hand at a steep angle.</p>
+      </div>
+
+      <!-- Tab 3: Rules & Scoring -->
+      <div class="tab-content hidden" id="tut-rules">
+        <p>Classic rules apply! Every round earns you XP and unlocks achievements:</p>
+        <div style="text-align: left; background: rgba(14, 20, 42, 0.7); padding: 14px; border-radius: 12px; font-size: 13px; line-height: 1.6;">
+          <div>• <b>Quick Match:</b> First to 2 wins.</div>
+          <div>• <b>Best of 5:</b> First to 3 wins or highest score after 5 rounds.</div>
+          <div>• <b>Survival:</b> Play until your first defeat. One loss ends the run!</div>
+          <div>• <b>Time Attack:</b> Win as many rounds as possible in 60 seconds!</div>
+          <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #283758;">
+            <b>🧠 AI Intelligence Strategies:</b>
+            <div>• <b>Easy:</b> Uniform random baseline.</div>
+            <div>• <b>Normal:</b> Predicts psychological Win-Stay / Lose-Shift tendencies.</div>
+            <div>• <b>🔥 Hard (Boss):</b> Multi-order Markov chain transitions & sequence tracking.</div>
+            <div>• <b>💀 Nightmare (Apex):</b> Full Iocaine Powder Meta-Predictor with anti-bluff modeling & faster reflex timing!</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="tutorialDoneBtn" style="margin-top: 14px;">I'M READY TO PLAY!</button>
+    </div>
+  </div>
+
+  <!-- Match End / Champion Modal -->
+  <div class="overlay hidden" id="endMatchOverlay">
+    <div class="modal-card">
+      <div class="modal-header-icon" id="endMatchIcon">🏆</div>
+      <div style="font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase;">
+        MATCH COMPLETE
+      </div>
+      <h2 id="endMatchTitle">YOU'RE THE CHAMPION!</h2>
+      <p id="endMatchDesc">Outstanding performance! You outsmarted Cyber-01 in the arena.</p>
+
+      <!-- Match XP Earned Card -->
+      <div style="background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 14px; padding: 12px; margin: 14px 0;">
+        <div style="font-family: var(--font-display); font-size: 12px; color: var(--cyan); font-weight: 800;">
+          XP GAINED: <span id="endMatchXpVal">+150 XP</span>
+        </div>
+        <div id="endMatchLevelUpNotice" style="font-size: 12px; color: var(--gold); margin-top: 4px; font-weight: 700;" class="hidden">
+          🎉 LEVEL UP! You reached a new rank!
+        </div>
+      </div>
+
+      <!-- Match Round History Breakdown -->
+      <div class="table-wrap">
+        <table class="cyber-table" id="endMatchHistoryTable">
+          <thead>
+            <tr>
+              <th>Round</th>
+              <th>Your Move</th>
+              <th>AI Move</th>
+              <th>Outcome</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 16px;">
+        <button id="playAgainBtn" class="btn-primary">↻ REMATCH</button>
+        <button id="changeModeBtn" class="btn-secondary">CHANGE MODE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Modal -->
+  <div class="overlay hidden" id="leaderboardOverlay">
+    <div class="modal-card large">
+      <button class="modal-close-btn" id="closeLeaderboardBtn">&times;</button>
+      <div class="modal-header-icon">🏆</div>
+      <h2>EXHIBITION <span>LEADERBOARD</span></h2>
+      <p>Top scores recorded on this exhibition terminal. Can you claim the #1 spot?</p>
+
+      <div class="table-wrap">
+        <table class="cyber-table" id="leaderboardTable">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Challenger</th>
+              <th>Mode</th>
+              <th>Score / Wins</th>
+              <th>Streak</th>
+              <th>Level</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+
+      <p style="font-size: 11px; color: var(--text-dim); margin-top: 6px;">
+        * Note: This is an on-device local leaderboard stored in this browser for the exhibition.
+      </p>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+        <button id="clearLeaderboardBtn" class="btn-secondary" style="font-size: 11px; color: var(--red); border-color: rgba(255, 51, 102, 0.4);">
+          🗑 Clear Records
+        </button>
+        <button id="leaderboardOkBtn" class="btn-primary">DONE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lifetime Stats & Achievements Modal -->
+  <div class="overlay hidden" id="statsOverlay">
+    <div class="modal-card large">
+      <button class="modal-close-btn" id="closeStatsBtn">&times;</button>
+      <div class="modal-header-icon">📊</div>
+      <h2>CAREER STATS & <span>ACHIEVEMENTS</span></h2>
+
+      <div class="modal-tabs">
+        <button class="tab-btn active" data-tab="stats-overview">Overview</button>
+        <button class="tab-btn" data-tab="stats-achievements">Achievements (8)</button>
+        <button class="tab-btn" data-tab="stats-profile">Edit Profile</button>
+      </div>
+
+      <!-- Stats Overview Tab -->
+      <div class="tab-content" id="stats-overview">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 16px 0;">
+          <div class="score-card"><span>TOTAL MATCHES</span><strong id="statTotalMatches">0</strong></div>
+          <div class="score-card player"><span>TOTAL WINS</span><strong id="statTotalWins">0</strong></div>
+          <div class="score-card"><span>WIN RATE</span><strong id="statWinRate">0%</strong></div>
+          <div class="score-card" style="border-color: var(--gold);"><span>BEST STREAK</span><strong id="statBestStreak" style="color: var(--gold);">0</strong></div>
+        </div>
+
+        <div style="background: rgba(14, 20, 42, 0.7); border: 1px solid #29385c; border-radius: 14px; padding: 12px; margin: 12px 0; text-align: left;">
+          <div style="font-family: var(--font-display); font-size: 12px; color: var(--cyan); margin-bottom: 6px;">FAVORITE GESTURES:</div>
+          <div style="display: flex; justify-content: space-around; font-size: 14px;">
+            <span>✊ Stone: <b id="statStoneCount">0</b></span>
+            <span>✋ Paper: <b id="statPaperCount">0</b></span>
+            <span>✌️ Scissors: <b id="statScissorsCount">0</b></span>
+          </div>
+        </div>
+
+        <button id="resetStatsBtn" class="btn-secondary" style="font-size: 11px; color: var(--red); border-color: rgba(255, 51, 102, 0.4); margin-top: 10px;">
+          ↻ Reset Statistics
+        </button>
+      </div>
+
+      <!-- Achievements Tab -->
+      <div class="tab-content hidden" id="stats-achievements">
+        <div class="achievements-grid" id="achievementsGrid"></div>
+      </div>
+
+      <!-- Edit Profile Tab -->
+      <div class="tab-content hidden" id="stats-profile">
+        <div style="max-width: 340px; margin: 0 auto; text-align: left;">
+          <label for="editNicknameInput" style="font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 6px;">UPDATE NICKNAME:</label>
+          <input type="text" id="editNicknameInput" maxlength="15" style="width: 100%; margin-bottom: 12px;">
+          <button id="saveProfileBtn" class="btn-primary" style="width: 100%;">SAVE PROFILE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="overlay hidden" id="settingsOverlay">
+    <div class="modal-card large">
+      <button class="modal-close-btn" id="closeSettingsBtn">&times;</button>
+      <div class="modal-header-icon">⚙️</div>
+      <h2>GAME & <span>KIOSK SETTINGS</span></h2>
+
+      <div style="text-align: left; margin: 16px 0;">
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">AI Difficulty Strategy</div>
+            <div class="setting-sub">Select intelligence level & mind-reading algorithm</div>
+          </div>
+          <select id="settingDifficultySelect">
+            <option value="easy">Easy (Random Baseline)</option>
+            <option value="normal">Normal (Psychological Heuristic)</option>
+            <option value="hard" selected>🔥 Hard (Markov Transition Counter)</option>
+            <option value="nightmare">💀 Nightmare (Iocaine Meta-Predictor)</option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Rapid Reflexes Countdown</div>
+            <div class="setting-sub">Faster 3-2-1 shoot timing for adrenaline-fueled reflex challenge</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="settingRapidReflexesToggle"><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Sound Effects (SFX)</div>
+            <div class="setting-sub">Web Audio synthesized retro cyber chimes</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="settingSoundToggle" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Voice Announcer</div>
+            <div class="setting-sub">Browser SpeechSynthesis countdown and victory calls</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="settingVoiceToggle" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Master Volume</div>
+            <div class="setting-sub">Control SFX and voice loudness</div>
+          </div>
+          <input type="range" id="settingVolumeSlider" min="0" max="1" step="0.05" value="0.8" style="width: 120px;">
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Show Hand Skeleton Overlay</div>
+            <div class="setting-sub">Draw real-time MediaPipe joint lines over the camera feed</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="settingOverlayToggle" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Reduced Motion Mode</div>
+            <div class="setting-sub">Disable intensive animations and confetti for accessibility</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="settingReducedMotionToggle"><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <div class="setting-label">Kiosk Attract Mode Timeout</div>
+            <div class="setting-sub">Auto-start demo screensaver after inactivity</div>
+          </div>
+          <select id="settingAttractSelect">
+            <option value="30">30 seconds</option>
+            <option value="45" selected>45 seconds</option>
+            <option value="60">60 seconds</option>
+            <option value="0">Disabled</option>
+          </select>
+        </div>
+
+        <!-- Exhibition Booth Customization -->
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #29385c;">
+          <div style="font-family: var(--font-display); font-size: 13px; color: var(--cyan); font-weight: 800; margin-bottom: 10px;">
+            🎪 EXHIBITION & BOOTH BRANDING
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <label style="font-size: 11px; color: var(--text-muted);">Event Name:</label>
+              <input type="text" id="settingEventName" style="width: 100%;">
+            </div>
+            <div>
+              <label style="font-size: 11px; color: var(--text-muted);">College / Dept:</label>
+              <input type="text" id="settingCollegeName" style="width: 100%;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button id="saveSettingsBtn" class="btn-primary" style="margin-top: 10px;">APPLY & CLOSE</button>
+    </div>
+  </div>
+
+  <!-- Exhibition QR Code & Booth Info Modal -->
+  <div class="overlay hidden" id="exhibitionOverlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="closeExhibitionBtn">&times;</button>
+      <div class="modal-header-icon">📱</div>
+      <div style="font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; color: var(--cyan);">
+        EXHIBITION BOOTH PORTAL
+      </div>
+      <h2>SCAN & PLAY ON <span>YOUR PHONE</span></h2>
+      <p>Visitors can scan this QR code with their mobile cameras to play on their own smartphones!</p>
+
+      <!-- Live SVG QR Code Container -->
+      <div id="qrCodeContainer" style="display: flex; justify-content: center; margin: 16px 0;"></div>
+
+      <!-- Public Host URL Config Input -->
+      <div style="text-align: left; background: rgba(14, 20, 42, 0.8); border: 1px solid #2e3c66; border-radius: 12px; padding: 12px; margin: 12px 0;">
+        <label for="publicUrlInput" style="font-size: 11px; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 4px;">
+          PUBLIC HOSTED URL (FOR QR CODE):
+        </label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="publicUrlInput" placeholder="http://192.168.x.x:8000 or https://..." style="flex: 1;">
+          <button id="copyUrlBtn" class="btn-secondary" style="padding: 6px 12px; font-size: 11px;">📋 COPY</button>
+        </div>
+        <p style="font-size: 11px; color: var(--text-dim); margin-top: 8px; line-height: 1.3;">
+          💡 <b>Tip for Organizers:</b> If running locally on <code>localhost</code>, enter your laptop's Wi-Fi LAN IP address (e.g. <code>http://192.168.1.50:8000</code>) or public URL so visitor phones can connect.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center; margin-top: 14px;">
+        <a href="ai-stone-paper-scissors-fest.zip" download="ai-stone-paper-scissors-fest.zip" class="btn-secondary" style="text-decoration: none; color: var(--gold); border-color: rgba(255, 215, 0, 0.4); display: inline-flex; align-items: center; gap: 6px;">
+          📥 DOWNLOAD PROJECT ZIP
+        </a>
+        <button id="closeExhibitionDoneBtn" class="btn-primary">DONE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Error Diagnostic Modal -->
+  <div class="overlay hidden" id="cameraErrorOverlay">
+    <div class="modal-card">
+      <div class="modal-header-icon" style="color: var(--red);">📷⚠️</div>
+      <div style="font-family: var(--font-display); font-size: 11px; letter-spacing: 2px; color: var(--red);">
+        CAMERA ACCESS ISSUE
+      </div>
+      <h2>WEBCAM NOT <span>AVAILABLE</span></h2>
+      <p id="cameraErrorMessage">Please allow camera permissions and ensure no other application is using your webcam.</p>
+
+      <div style="text-align: left; background: rgba(14, 20, 42, 0.7); border: 1px solid #29385c; border-radius: 12px; padding: 14px; font-size: 13px; margin: 14px 0; line-height: 1.5;">
+        <div><b>Troubleshooting Steps:</b></div>
+        <div>1. Click the <b>Camera icon</b> in your browser URL address bar and select "Allow".</div>
+        <div>2. Ensure the site is opened on <code>localhost</code> or <code>https://</code> (camera requires secure context).</div>
+        <div>3. Close other apps that may be using the camera (Zoom, Teams, Skype, Meet).</div>
+        <div>4. You can also play immediately using the <b>Manual Move Buttons</b> below the arena!</div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="retryCameraBtn" class="btn-primary">TRY AGAIN</button>
+        <button id="useManualControlsBtn" class="btn-secondary">PLAY WITH BUTTONS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attract Mode / Kiosk Screensaver -->
+  <div class="attract-screen hidden" id="attractScreen">
+    <div class="attract-badge">COLLEGE CAREER FEST 2026 • AI EXHIBITION</div>
+    <h1>CHALLENGE <span>THE AI!</span></h1>
+    <p style="font-size: 18px; color: var(--text-muted); max-width: 600px;">
+      Real-Time Computer Vision Hand Showdown. Test your reflexes against our machine learning algorithm!
+    </p>
+
+    <!-- Simulated Replay Demonstration -->
+    <div class="attract-demo-box">
+      <div style="text-align: center;">
+        <div style="font-family: var(--font-display); font-size: 11px; color: var(--cyan); margin-bottom: 6px;">HUMAN MOVE</div>
+        <div class="demo-move" id="demoHumanMove">✊</div>
+      </div>
+      <div style="font-family: var(--font-display); font-size: 24px; font-weight: 900; color: #fff;">VS</div>
+      <div style="text-align: center;">
+        <div style="font-family: var(--font-display); font-size: 11px; color: var(--pink); margin-bottom: 6px;">AI MOVE</div>
+        <div class="demo-move" id="demoAiMove">✌️</div>
+      </div>
+    </div>
+
+    <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">
+      [ SIMULATED EXHIBITION DEMO — PURE ON-DEVICE PRIVACY ]
+    </div>
+
+    <button class="attract-play-btn" id="exitAttractBtn">
+      TOUCH SCREEN OR PRESS ANY KEY TO PLAY NOW!
+    </button>
+  </div>
+
+  <!-- Toast Container for Achievements -->
+  <div id="toastContainer"></div>
+
+  <!-- Application Bootstrap -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

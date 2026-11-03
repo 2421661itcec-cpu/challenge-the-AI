@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" width="100%" height="100%">
+  <defs>
+    <!-- Radial aura glows -->
+    <radialGradient id="outerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#a855f7" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#070a1a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="visorGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#141c38"/>
+      <stop offset="80%" stop-color="#060917"/>
+    </radialGradient>
+    <!-- Metallic body gradient -->
+    <linearGradient id="bodyWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#e2ebf8"/>
+      <stop offset="85%" stop-color="#9bb0d6"/>
+      <stop offset="100%" stop-color="#697f9e"/>
+    </linearGradient>
+    <linearGradient id="cyanNeon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="earGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <!-- Glow filters -->
+    <filter id="neonBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="intenseGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur2"/>
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#00f0ff" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Glow Behind Robot -->
+  <circle cx="160" cy="160" r="145" fill="url(#outerGlow)"/>
+
+  <!-- Holographic floating ring -->
+  <ellipse cx="160" cy="255" rx="90" ry="22" fill="none" stroke="#00f0ff" stroke-width="2.5" stroke-dasharray="10 8" opacity="0.65" filter="url(#neonBlur)"/>
+  <ellipse cx="160" cy="255" rx="65" ry="15" fill="none" stroke="#a855f7" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Antenna -->
+  <path d="M 160,82 L 160,42" stroke="#94a3b8" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="160" cy="38" r="9" fill="#00f0ff" filter="url(#intenseGlow)"/>
+  <circle cx="160" cy="38" r="4" fill="#ffffff"/>
+
+  <!-- Robot Ears / Audio Sensors -->
+  <rect x="56" y="112" width="14" height="42" rx="7" fill="url(#earGradient)" filter="url(#dropShadow)"/>
+  <rect x="250" y="112" width="14" height="42" rx="7" fill="url(#earGradient)" filter="url(#dropShadow)"/>
+  <circle cx="63" cy="133" r="3.5" fill="#00f0ff" filter="url(#neonBlur)"/>
+  <circle cx="257" cy="133" r="3.5" fill="#00f0ff" filter="url(#neonBlur)"/>
+
+  <!-- Main Head Chassis -->
+  <rect x="68" y="68" width="184" height="136" rx="42" fill="url(#bodyWhite)" filter="url(#dropShadow)"/>
+  
+  <!-- Subtle specular highlight on head top -->
+  <path d="M 100,74 Q 160,68 220,74 Q 210,84 160,80 Q 110,84 100,74 Z" fill="#ffffff" opacity="0.65"/>
+
+  <!-- Dark High-Gloss Visor Screen -->
+  <rect x="84" y="84" width="152" height="104" rx="28" fill="url(#visorGlow)" stroke="#334155" stroke-width="2.5"/>
+
+  <!-- Glowing Digital Eyes -->
+  <g filter="url(#intenseGlow)">
+    <!-- Left Eye -->
+    <ellipse cx="124" cy="128" rx="14" ry="18" fill="#00f0ff"/>
+    <ellipse cx="127" cy="124" rx="5" ry="7" fill="#ffffff"/>
+    <ellipse cx="120" cy="135" rx="2.5" ry="3" fill="#ffffff" opacity="0.8"/>
+
+    <!-- Right Eye -->
+    <ellipse cx="196" cy="128" rx="14" ry="18" fill="#00f0ff"/>
+    <ellipse cx="199" cy="124" rx="5" ry="7" fill="#ffffff"/>
+    <ellipse cx="192" cy="135" rx="2.5" ry="3" fill="#ffffff" opacity="0.8"/>
+
+    <!-- Friendly Digital Smile -->
+    <path d="M 144,156 Q 160,167 176,156" fill="none" stroke="#00f0ff" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Visor Glass Glare Reflection -->
+  <path d="M 94,92 Q 150,86 210,92 L 180,108 Q 140,102 104,110 Z" fill="#ffffff" opacity="0.12"/>
+
+  <!-- Neck Connection -->
+  <rect x="144" y="202" width="32" height="14" rx="4" fill="#64748b"/>
+  <rect x="148" y="206" width="24" height="6" rx="2" fill="#334155"/>
+
+  <!-- Floating Lower Torso Body -->
+  <rect x="105" y="214" width="110" height="46" rx="23" fill="url(#bodyWhite)" filter="url(#dropShadow)"/>
+  
+  <!-- Chest Holographic Core Badge -->
+  <circle cx="160" cy="237" r="10" fill="#090d1f" stroke="#00f0ff" stroke-width="1.5"/>
+  <path d="M 160,229 L 162.5,234.5 L 168,237 L 162.5,239.5 L 160,245 L 157.5,239.5 L 152,237 L 157.5,234.5 Z" fill="#00f0ff" filter="url(#neonBlur)"/>
+</svg>
